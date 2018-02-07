@@ -42,6 +42,17 @@ public class ImageActivity extends Activity{
         myAsyncTask.execute(URLPATH);
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        /**for thread wait bug:
+         click back menu while progressbar running and entry again,
+         then you can see bug:progressbar doesn't running until the last thread end from background*/
+        if (myAsyncTask != null && myAsyncTask.getStatus() == AsyncTask.Status.RUNNING){
+            myAsyncTask.cancel(true);
+        }
+    }
+
     class MyAsyncTask extends AsyncTask<String,Integer,Bitmap>{
 
         @Override
@@ -75,6 +86,10 @@ public class ImageActivity extends Activity{
                 byte[] bytes = new byte[1024];
                 in = connection.getInputStream();
                 while ((perLength = in.read(bytes)) != -1){
+                    /**for thread wait bug*/
+                    if (isCancelled()){
+                        break;
+                    }/**bug end*/
                     progressLength += perLength;
                     if (totalLength == 0) {
                         publishProgress(-1);
