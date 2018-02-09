@@ -5,10 +5,13 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -57,6 +60,7 @@ public class ImageActivity extends Activity{
 
         @Override
         protected void onProgressUpdate(Integer... values) {
+            Log.d("gsl","--------------onProgressUpdate");
             super.onProgressUpdate(values);
             progressBar.setProgress(values[0]);
             progressText.setText("Type:"+contentType+"  已加载："+values[0].toString()+"%");
@@ -64,6 +68,7 @@ public class ImageActivity extends Activity{
 
         @Override
         protected void onPreExecute() {
+            Log.d("gsl","--------------onPreExecute");
             super.onPreExecute();
             progressBar.setVisibility(View.VISIBLE);
             progressText.setVisibility(View.VISIBLE);
@@ -71,6 +76,7 @@ public class ImageActivity extends Activity{
 
         @Override
         protected Bitmap doInBackground(String... params) {
+Log.d("gsl","--------------doInBackground");
             String url = params[0];
             Bitmap bitmap = null;
             URLConnection connection;
@@ -80,12 +86,14 @@ public class ImageActivity extends Activity{
             try {
                 connection = new URL(url).openConnection();
                 int totalLength = connection.getContentLength();
+Log.d("gsl","--------------totalLength="+totalLength);
                 contentType = connection.getContentType();
                 int progressLength = 0;
                 int perLength = -1;
                 byte[] bytes = new byte[1024];
                 in = connection.getInputStream();
                 while ((perLength = in.read(bytes)) != -1){
+Log.d("gsl","--------------while");
                     /**for thread wait bug*/
                     if (isCancelled()){
                         break;
@@ -110,8 +118,10 @@ public class ImageActivity extends Activity{
                 outputStream.close();
                 //bufIn.close();
             } catch (IOException e) {
+                Log.d("gsl","--------------IOException"+e);
                 e.printStackTrace();
             } catch (InterruptedException e) {
+                Log.d("gsl","--------------InterruptedException"+e);
                 e.printStackTrace();
             }
 
@@ -120,6 +130,7 @@ public class ImageActivity extends Activity{
 
         @Override
         protected void onPostExecute(Bitmap bitmap) {
+            Log.d("gsl","--------------onPostExecute");
             super.onPostExecute(bitmap);
             progressBar.setVisibility(View.GONE);
             progressText.setVisibility(View.GONE);
